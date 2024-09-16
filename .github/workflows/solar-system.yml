@@ -81,7 +81,7 @@ jobs:
           with:
             context: .
             push: false
-            tags: ${{secrets.dockerusername}}/solar-system:${{github.sha::7}}
+            tags: ${{secrets.dockerusername}}/solar-system:latest
 
         - name: Docker Image Id
           run: |
