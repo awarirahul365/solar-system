@@ -74,13 +74,14 @@ jobs:
           with:
             username: ${{secrets.dockerusername}}
             password: ${{secrets.dockerpassword}}
+
         - name: Build Docker Image
           id: build-image
           uses: docker/build-push-action@v6
           with:
             context: .
             push: false
-            tags: ${{secrets.dockerusername}}/solar-system:${{github.sha}}
+            tags: ${{secrets.dockerusername}}/solar-system:${{github.sha::7}}
 
         - name: Docker Image Id
           run: |
