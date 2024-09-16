@@ -80,7 +80,7 @@ jobs:
           uses: docker/build-push-action@v6
           with:
             context: .
-            push: false
+            push: true
             tags: latest
 
         - name: Docker Image Id
