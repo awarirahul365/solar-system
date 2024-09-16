@@ -24,6 +24,7 @@ jobs:
             node-version: 20
     
         - name: Install Dependencies
+          id: node-unit-testing
           run: npm install
     
         - name: Unit Testing
@@ -51,7 +52,6 @@ jobs:
           run: npm install
     
         - name: Code coverage
-          continue-on-error: true
           run: npm run coverage
 
         - name: Archive Test Result
@@ -59,4 +59,29 @@ jobs:
           with:
             name: Code-Coverage-Result
             path: coverage
+            retention-days: 5
+
+    docker:
+      name: Containerization
+      needs: [unit-testing,code-coverage]
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+        - name: Dockerhub login
+          uses: docker/login-action
+          with:
+            username: ${{secrets.dockerusername}}
+            password: ${{secrets.dockerpassword}}
+        - name: Build Docker Image
+          id: build-image
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            push: false
+            tags: ${{secrets.dockerusername}}/solar-system:${{github.sha}}
+
+        - name: Docker Image Id
+          run: |
+            echo ${{steps.build-image.outputs}}
           
