@@ -85,5 +85,5 @@ jobs:
 
         - name: Docker Image Id
           run: |
-            echo ${{steps.build-image.outputs}}
+            echo ${{fromJSON(steps.build-image.outputs.metadata)['image.name']}}
           
