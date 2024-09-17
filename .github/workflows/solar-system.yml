@@ -14,6 +14,15 @@ jobs:
   unit-testing:
     name: Unit Testing
     runs-on: ubuntu-latest
+    services:
+      mongo-db:
+        image: siddharth67/mongo-db:non-prod
+        ports:
+          - 27017:27017
+    env:
+      MONGO_URI: "mongodb//localhost:27017/superData"
+      MONGO_USERNAME: non-prod-user
+      MONGO_PASSWORD: non-prod-password
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -98,24 +107,3 @@ jobs:
         run: |
           docker images
           echo ${{fromJSON(steps.build-image.outputs.metadata)['image.name']}}
-
-  build-publish-package:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-      # Setup .npmrc file to publish to npm
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Run NPM
-        uses: npm install
-
-      - run: npm ci
-      - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
