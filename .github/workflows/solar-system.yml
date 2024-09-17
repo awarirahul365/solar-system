@@ -115,6 +115,9 @@ jobs:
     env:
       RESOURCE_GROUP_NAME: "monitoring-poc"
       CLUSTER_NAME: "elk-pilot"
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
