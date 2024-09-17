@@ -1,89 +1,88 @@
 name: Solar System Workflow
 
-on: 
+on:
   workflow_dispatch:
   push:
     branches:
       - main
-      - 'feature/*'
+      - "feature/*"
 env:
-    MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
-    MONGO_USERNAME: 'superuser'
-    MONGO_PASSWORD: ${{secrets.MONGO_PASSWORD}}
+  MONGO_URI: "mongodb+srv://supercluster.d83jj.mongodb.net/superData"
+  MONGO_USERNAME: "superuser"
+  MONGO_PASSWORD: ${{secrets.MONGO_PASSWORD}}
 jobs:
-    unit-testing:
-        name: Unit Testing
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+  unit-testing:
+    name: Unit Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-        - name: Setup NodeJS Version
-          uses: actions/setup-node@v3
-          with:
-            node-version: 20
-    
-        - name: Install Dependencies
-          id: node-unit-testing
-          run: npm install
-    
-        - name: Unit Testing
-          run: npm test
+      - name: Setup NodeJS Version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-        - name: Archive Test Result
-          uses: actions/upload-artifact@v4
-          with:
-            name: Mocha-Test-Result
-            path: test-results.xml
-    
-    code-coverage:
-        name: code-coverage
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+      - name: Install Dependencies
+        id: node-unit-testing
+        run: npm install
 
-        - name: Setup NodeJS Version
-          uses: actions/setup-node@v3
-          with:
-            node-version: 20
-    
-        - name: Install Dependencies
-          run: npm install
-    
-        - name: Code coverage
-          continue-on-error: true
-          run: npm run coverage
+      - name: Unit Testing
+        run: npm test
 
-        - name: Archive Test Result
-          uses: actions/upload-artifact@v4
-          with:
-            name: Code-Coverage-Result
-            path: coverage
-            retention-days: 5
+      - name: Archive Test Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mocha-Test-Result
+          path: test-results.xml
 
-    docker:
-      name: Containerization
-      needs: [unit-testing,code-coverage]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v4
-        - name: Dockerhub login
-          uses: docker/login-action@v3
-          with:
-            username: ${{secrets.dockerusername}}
-            password: ${{secrets.dockerpassword}}
+  code-coverage:
+    name: code-coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-        - name: Build Docker Image
-          id: build-image
-          uses: docker/build-push-action@v6
-          with:
-            context: .
-            push: true
-            tags: latest
+      - name: Setup NodeJS Version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-        - name: Docker Image Id
-          run: |
-            echo ${{fromJSON(steps.build-image.outputs.metadata)['image.name']}}
-          
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Code coverage
+        continue-on-error: true
+        run: npm run coverage
+
+      - name: Archive Test Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: Code-Coverage-Result
+          path: coverage
+          retention-days: 5
+
+  docker:
+    name: Containerization
+    needs: [unit-testing, code-coverage]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Dockerhub login
+        uses: docker/login-action@v3
+        with:
+          username: ${{secrets.dockerusername}}
+          password: ${{secrets.dockerpassword}}
+
+      - name: Build Docker Image
+        id: build-image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: latest
+
+      - name: Docker Image Id
+        run: |
+          echo ${{fromJSON(steps.build-image.outputs.metadata)['image.name']}}
