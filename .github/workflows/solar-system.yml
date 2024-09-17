@@ -108,3 +108,19 @@ jobs:
         run: |
           docker images
           echo ${{fromJSON(steps.build-image.outputs.metadata)['image.name']}}
+
+  dev-deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install CLI
+        uses: azure/setup-kubectl@v4
+        id: kubectl-install
+
+      - name: Fetch Cluster details
+        run: |
+          kubectl version --short 
+          kubectl get nodes
