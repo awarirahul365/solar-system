@@ -137,5 +137,4 @@ jobs:
 
       - name: Fetch Cluster details
         run: |
-          kubectl version --short 
           kubectl get nodes
