@@ -139,6 +139,10 @@ jobs:
         run: |
           kubectl get nodes
 
+      - name: Check if Namespace Exists
+        run: |
+          kubectl get namespace ${{vars.NAMESPACE}} || kubectl create namespace ${{vars.NAMESPACE}}
+
       - name: Fetch IP dynamically
         run: |
           echo "INGRESS_IP=$(kubectl -n ingress-nginx get svc ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" >> $GITHUB_ENV
