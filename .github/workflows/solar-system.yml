@@ -112,6 +112,7 @@ jobs:
   dev-deploy:
     needs: docker
     runs-on: ubuntu-latest
+    if: contains(github.ref,'feature/')
     environment:
       name: DEVELOPMENT
     env:
@@ -181,6 +182,7 @@ jobs:
 
   prod-deploy:
     needs: docker
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: PRODUCTION
