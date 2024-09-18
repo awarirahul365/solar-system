@@ -112,6 +112,8 @@ jobs:
   dev-deploy:
     needs: docker
     runs-on: ubuntu-latest
+    environment:
+      name: DEVELOPMENT
     env:
       RESOURCE_GROUP_NAME: "monitoring-poc"
       CLUSTER_NAME: "elk-pilot"
