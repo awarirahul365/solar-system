@@ -116,6 +116,9 @@ jobs:
     secrets:
       azure-credential: ${{secrets.AZURE_CREDENTIALS}}
       mongodb-password: ${{secrets.MONGO_PASSWORD}}
+    with:
+      mongo-db-uri: "mongodb+srv://supercluster.d83jj.mongodb.net/superData"
+      mongo-db-username: "superuser"
 
   prod-deploy:
     needs: docker
