@@ -78,7 +78,6 @@ jobs:
       - name: Check Files
         run: |
           cat ${{inputs.k8s-path}}/*.yaml
-          cat ${{secrets.dockerusername}}/solar-system
 
       - name: Get Secrets
         run: |
