@@ -9,17 +9,25 @@ on:
       mongo-db-username:
         required: true
         type: string
+      environment:
+        required: true
+        type: string
+      k8s-path:
+        required: true
+        type: string
     secrets:
       azure-credential:
         required: true
       mongodb-password:
+        required: true
+      dockerusername:
         required: true
 
 jobs:
   reuse-deploy:
     runs-on: ubuntu-latest
     environment:
-      name: DEVELOPMENT
+      name: ${{inputs.environment}}
     env:
       RESOURCE_GROUP_NAME: "monitoring-poc"
       CLUSTER_NAME: "elk-pilot"
@@ -60,16 +68,17 @@ jobs:
         with:
           tokenPrefix: "_{_"
           tokenSuffix: "_}_"
-          files: '["kubernetes/development/*.yaml"]'
+          files: '["${{inputs.k8s-path}}/*.yaml"]'
         env:
           NAMESPACE: ${{vars.NAMESPACE}}
           REPLICAS: ${{vars.REPLICAS}}
-          IMAGE: ${{secrets.DOCKER_USERNAME}}/solar-system
+          IMAGE: ${{secrets.dockerusername}}/solar-system
           INGRESS_IP: ${{env.INGRESS_IP}}
 
       - name: Check Files
         run: |
-          cat kubernetes/development/*.yaml
+          cat ${{inputs.k8s-path}}/*.yaml
+          cat ${{secrets.dockerusername}}/solar-system
 
       - name: Get Secrets
         run: |
@@ -83,4 +92,4 @@ jobs:
 
       - name: Apply AKS
         run: |
-          kubectl apply -f kubernetes/development
+          kubectl apply -f ${{inputs.k8s-path}}
