@@ -33,9 +33,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies
-        id: node-unit-testing
-        run: npm install
+      - name: Cache and Install Dependencies
+        uses: ./.github/custom-actions/npm-action
+        with:
+          path-of-folder: node_modules
 
       - name: Unit Testing
         run: npm test
