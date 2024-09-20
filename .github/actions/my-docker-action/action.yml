@@ -1,0 +1,13 @@
+name: 'My Docker Action'
+description: 'An example Docker action to use with the main project'
+
+inputs:
+  my-input:
+    description: 'A message to display'
+    required: true
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.my-input }}

@@ -1,0 +1,15 @@
+name: Run My Docker Action
+
+on: [push]
+
+jobs:
+  run-docker-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Run your Docker Action
+      - name: Run Docker action with input
+        uses: ./.github/actions/my-docker-action
+        with:
+          my-input: "Hello from the main project!"
