@@ -10,6 +10,19 @@ pipeline {
         JUNIT_REPORT_PATH="test-results.xml"  // Add this to specify the output file
     }
     stages {  
+        stage('Install Docker') {
+            steps {
+                sh '''
+                    if ! command -v docker &> /dev/null; then
+                        curl -fsSL https://get.docker.com -o get-docker.sh
+                        sudo sh get-docker.sh
+                        sudo usermod -aG docker jenkins
+                        sudo systemctl enable docker
+                        sudo systemctl start docker
+                    fi
+                '''
+            }
+        }
         stage('Node Version and checkout') {
             steps {
                 sh '''
