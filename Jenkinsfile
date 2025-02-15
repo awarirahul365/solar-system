@@ -47,13 +47,30 @@ pipeline {
         }
         stage('Build Docker image') {
             agent {
-                docker {
-                    image 'docker:dind'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                kubernetes {
+                    yaml '''
+                        apiVersion: v1
+                        kind: Pod
+                        spec:
+                          containers:
+                          - name: docker
+                            image: docker:dind
+                            securityContext:
+                              privileged: true
+                            volumeMounts:
+                              - name: dind-storage
+                                mountPath: /var/lib/docker
+                            tty: true
+                          volumes:
+                            - name: dind-storage
+                              emptyDir: {}
+                    '''
                 }
             }
             steps {
-                sh 'docker build -t siddharth67/solar-system:$GIT_COMMIT .'
+                container('docker') {
+                    sh 'docker build -t siddharth67/solar-system:$GIT_COMMIT .'
+                }
             }
         }
     }
