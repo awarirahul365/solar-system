@@ -2,6 +2,7 @@ pipeline {
     agent any
     tools{
         nodejs 'nodejs-22-6-0'
+        dockerTool 'docker-latest'
     }
     environment{
         MONGO_URI="mongodb+srv://supercluster.d83jj.mongodb.net/superData"
@@ -10,19 +11,6 @@ pipeline {
         JUNIT_REPORT_PATH="test-results.xml"  // Add this to specify the output file
     }
     stages {  
-        stage('Install Docker') {
-            steps {
-                sh '''
-                    if ! command -v docker &> /dev/null; then
-                        curl -fsSL https://get.docker.com -o get-docker.sh
-                        sh get-docker.sh
-                        usermod -aG docker jenkins
-                        systemctl enable docker || true
-                        systemctl start docker || true
-                    fi
-                '''
-            }
-        }
         stage('Node Version and checkout') {
             steps {
                 sh '''
