@@ -56,8 +56,8 @@ pipeline {
                           - name: docker
                             image: docker:dind
                             securityContext:
-                              privileged: true
-                              allowPrivilegeEscalation: true
+                              privileged: false
+                              allowPrivilegeEscalation: false
                             volumeMounts:
                               - name: dind-storage
                                 mountPath: /var/lib/docker
