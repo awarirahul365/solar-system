@@ -45,8 +45,14 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker image'){
-            steps{
+        stage('Build Docker image') {
+            agent {
+                docker {
+                    image 'docker:dind'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+            steps {
                 sh 'docker build -t siddharth67/solar-system:$GIT_COMMIT .'
             }
         }
