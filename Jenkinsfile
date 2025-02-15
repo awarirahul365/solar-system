@@ -48,7 +48,7 @@ pipeline {
         stage('Build Docker image') {
             agent {
                 kubernetes {
-                    yaml '''
+                     yaml '''
                         apiVersion: v1
                         kind: Pod
                         spec:
@@ -57,6 +57,7 @@ pipeline {
                             image: docker:dind
                             securityContext:
                               privileged: true
+                              allowPrivilegeEscalation: true
                             volumeMounts:
                               - name: dind-storage
                                 mountPath: /var/lib/docker
