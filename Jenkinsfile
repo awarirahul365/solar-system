@@ -71,7 +71,7 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman build -t siddharth67/solar-system:$GIT_COMMIT --storage-driver=fuse-overlay .
+                        podman build -t siddharth67/solar-system:$GIT_COMMIT --storage-driver=overlay .
                     '''
                 }
             }
