@@ -1,17 +1,16 @@
 pipeline {
     agent any
-    tools{
+    tools {
         nodejs 'nodejs-22-6-0'
-        dockerTool 'docker-latest'
     }
-    environment{
+    environment {
         MONGO_URI="mongodb+srv://supercluster.d83jj.mongodb.net/superData"
         MONGO_USERNAME="superuser"
         MONGO_PASSWORD="superpassword"
-        JUNIT_REPORT_PATH="test-results.xml"  // Add this to specify the output file
+        JUNIT_REPORT_PATH="test-results.xml"
     }
     stages {  
-        stage('Node Version and checkout') {
+        stage('Node Version and Checkout') {
             steps {
                 sh '''
                     ls -R
@@ -20,15 +19,13 @@ pipeline {
                 '''
             }
         }
-        stage('Install dependencies') {
+        stage('Install Dependencies') {
             steps {
-                sh '''
-                    npm install --no-audit
-                '''
+                sh 'npm install --no-audit'
             }
         }
-        stage('Unit Testing'){
-            steps{
+        stage('Unit Testing') {
+            steps {
                 withCredentials([usernamePassword(credentialsId: 'mongo-db-credential', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     catchError(buildResult: 'SUCCESS', message: 'This will be fixed later', stageResult: 'UNSTABLE') {
                         sh 'npm test'
@@ -36,8 +33,8 @@ pipeline {
                 }
             }
         }
-        stage('Code Coverage'){
-            steps{
+        stage('Code Coverage') {
+            steps {
                 withCredentials([usernamePassword(credentialsId: 'mongo-db-credential', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USERNAME')]) {
                     catchError(buildResult: 'SUCCESS', message: 'This will be fixed later', stageResult: 'UNSTABLE') {
                         sh 'npm run coverage'
@@ -45,32 +42,37 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker image') {
+        stage('Build Image with Podman') {
             agent {
                 kubernetes {
-                     yaml '''
+                    yaml '''
                         apiVersion: v1
                         kind: Pod
+                        metadata:
+                          labels:
+                            app: podman-builder
                         spec:
                           containers:
-                          - name: docker
-                            image: docker:dind
+                          - name: podman
+                            image: quay.io/podman/stable
                             securityContext:
                               privileged: false
                               allowPrivilegeEscalation: false
                             volumeMounts:
-                              - name: dind-storage
-                                mountPath: /var/lib/docker
+                              - name: podman-storage
+                                mountPath: /var/lib/containers
                             tty: true
                           volumes:
-                            - name: dind-storage
+                            - name: podman-storage
                               emptyDir: {}
                     '''
                 }
             }
             steps {
-                container('docker') {
-                    sh 'docker build -t siddharth67/solar-system:$GIT_COMMIT .'
+                container('podman') {
+                    sh '''
+                        podman build -t siddharth67/solar-system:$GIT_COMMIT --storage-driver=vfs .
+                    '''
                 }
             }
         }
