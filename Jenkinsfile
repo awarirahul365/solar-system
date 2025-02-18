@@ -60,7 +60,7 @@ pipeline {
                               allowPrivilegeEscalation: false
                             volumeMounts:
                               - name: podman-storage
-                                mountPath: /var/lib/containers
+                                mountPath: /home/container-user/.local/share/containers/storage
                             tty: true
                           volumes:
                             - name: podman-storage
@@ -71,7 +71,9 @@ pipeline {
             steps {
                 container('podman') {
                     sh '''
-                        podman build -t siddharth67/solar-system:$GIT_COMMIT --storage-driver=vfs .
+                        export XDG_RUNTIME_DIR=/tmp/podman
+                        mkdir -p $XDG_RUNTIME_DIR
+                        podman build -t siddharth67/solar-system:$GIT_COMMIT --storage-driver=overlay .
                     '''
                 }
             }
