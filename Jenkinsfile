@@ -60,6 +60,7 @@ pipeline {
                               tty: true
                               securityContext:
                                 privileged: true
+                                # Remove allowPrivilegeEscalation or set to true
                               volumeMounts:
                                 - name: podman-storage
                                   mountPath: /var/lib/containers
