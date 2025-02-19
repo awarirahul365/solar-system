@@ -49,29 +49,30 @@ pipeline {
                         apiVersion: v1
                         kind: Pod
                         metadata:
-                        labels:
-                            app: buildah-builder
+                          labels:
+                            app: podman-builder
                         spec:
-                        containers:
-                        - name: buildah
-                            image: quay.io/buildah/stable
-                            securityContext:
-                            privileged: false
-                            allowPrivilegeEscalation: false
-                            volumeMounts:
-                            - name: buildah-storage
-                                mountPath: /var/lib/containers
-                            tty: true
-                        volumes:
-                            - name: buildah-storage
-                            emptyDir: {}
+                          containers:
+                            - name: podman
+                              image: quay.io/podman/stable
+                              command:
+                                - cat
+                              tty: true
+                              securityContext:
+                                privileged: true
+                              volumeMounts:
+                                - name: podman-storage
+                                  mountPath: /var/lib/containers
+                          volumes:
+                            - name: podman-storage
+                              emptyDir: {}
                     '''
                 }
             }
             steps {
-                container('buildah') {
+                container('podman') {
                     sh '''
-                        buildah bud --isolation chroot -t siddharth67/solar-system:$GIT_COMMIT .
+                        podman build -t siddharth67/solar-system:$GIT_COMMIT .
                     '''
                 }
             }
