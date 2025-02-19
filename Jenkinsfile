@@ -42,38 +42,34 @@ pipeline {
                 }
             }
         }
-        stage('Build Image with Podman') {
+        stage('Build Image with Buildah') {
             agent {
                 kubernetes {
                     yaml '''
                         apiVersion: v1
                         kind: Pod
-                        metadata:
-                          labels:
-                            app: podman-builder
                         spec:
-                          containers:
-                            - name: podman
-                              image: quay.io/podman/stable
-                              command:
-                                - cat
-                              tty: true
-                              securityContext:
-                                privileged: true
-                                # Remove allowPrivilegeEscalation or set to true
-                              volumeMounts:
-                                - name: podman-storage
-                                  mountPath: /var/lib/containers
-                          volumes:
-                            - name: podman-storage
-                              emptyDir: {}
+                        containers:
+                        - name: buildah
+                            image: quay.io/buildah/stable
+                            command:
+                            - cat
+                            tty: true
+                            securityContext:
+                            privileged: true
+                            volumeMounts:
+                            - name: varlibcontainers
+                                mountPath: /var/lib/containers
+                        volumes:
+                            - name: varlibcontainers
+                            emptyDir: {}
                     '''
                 }
             }
             steps {
-                container('podman') {
+                container('buildah') {
                     sh '''
-                        podman build -t siddharth67/solar-system:$GIT_COMMIT .
+                        buildah bud -t siddharth67/solar-system:$GIT_COMMIT .
                     '''
                 }
             }
