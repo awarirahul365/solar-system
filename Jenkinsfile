@@ -49,19 +49,19 @@ pipeline {
                         apiVersion: v1
                         kind: Pod
                         spec:
-                        containers:
-                        - name: buildah
+                          containers:
+                          - name: buildah
                             image: quay.io/buildah/stable
                             command:
                             - cat
                             tty: true
                             securityContext:
-                            privileged: true
+                              privileged: true
                             volumeMounts:
                             - name: varlibcontainers
-                                mountPath: /var/lib/containers
-                        volumes:
-                            - name: varlibcontainers
+                              mountPath: /var/lib/containers
+                          volumes:
+                          - name: varlibcontainers
                             emptyDir: {}
                     '''
                 }
